@@ -100,13 +100,13 @@ promise2.then(val => {
 ```
 
 ### 2.3. Promise 处理
-**promise 处理程序** 是一个抽象的操作，它接收一个 promise 和一个值作为参数，伪代码表示为 `[[Resolve]](promise, x)`。如果 `x` 是一个定义了 `then` 方法的对象或函数，此操作将尝试让 `promise` 采用 `x` 的状态，前提是 `x` 的行为跟 promise 相似。否则，`promise` 将携带 `x` 转换为"成功"。
+**promise 处理** 是一个抽象的操作，它接收一个 promise 和一个值作为参数，伪代码表示为 `[[Resolve]](promise, x)`。如果 `x` 是一个定义了 `then` 方法的对象或函数，此操作将尝试让 `promise` 采用 `x` 的状态，前提是 `x` 的行为跟 promise 相似。否则，`promise` 将以 `x` 为参数"成功"。
 
 这种 thenables 的处理使得 promise 的实现更具通用性，只需要暴露一个符合 Promise/A+ 规范的 `then` 方法。在有符合规范的 `then` 方法前提下，允许 Promise/A+ 实现与不符合规范的实现共存。
 
 为了实现 `[[Resolve]](promise, x)`，需遵循以下内容：
 
-2.3.1. 如果 `promise` 和 `x` 指向同一个对象，reject 这个 `promise`，抛出一个 `TypeError` 异常。
+2.3.1. 如果 `promise` 和 `x` 指向同一个对象，`promise` 将失败，并抛出 `TypeError` 异常。
 
 2.3.2. 如果 `x` 是一个 promise，则采用它的状态：<sup>注4</sup>
 - 如果 `x` 处于 pending，`promise` 必须停留在 pending 状态，直到 x 转换为 fulfilled 或 rejected。
@@ -115,8 +115,8 @@ promise2.then(val => {
 
 2.3.3. 如果 `x` 是一个对象或函数时：
 - 把 `x.then` 赋值给 `then`。<sup>注5</sup>
-- 如果取 `x.then` 的值时抛出错误 `e`，则以 `e` 为据因拒绝 `promise`。
-- 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
+- 如果取 `x.then` 的值时抛出异常 `e`，则以 `e` 为据因拒绝 `promise`。
+- 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，`then` 的第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
   - 如果 `resolvePromise` 被调用后返回值 `y`，则继续运行 `[[Resolve]](promise, y)`。
   - 如果 `rejectPromise` 被调用后返回据因 `r`，则以据因为 `r` 拒绝 promise。
   - 如果 `resolvePromise` 和 `rejectPromise` 均被调用，或以同一参数多次调用，第一次调用将有优先权，并忽略其他的调用。
