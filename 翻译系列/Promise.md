@@ -68,7 +68,7 @@ promise.then(onFulfilled, onRejected);
 - 调用次数不超过一次
 
 2.2.3. 如果 `onRejected` 是一个函数：
-- 在 `promise` 状态变为 fulfilled 后必须被调用，用 `promise` 失败的原因作为第一个参数。
+- 在 `promise` 状态变为 rejected 后必须被调用，用 `promise` 失败的原因作为第一个参数。
 - 在 `promise` 状态变为 rejected 之前不能被调用
 - 调用次数不超过一次
 
