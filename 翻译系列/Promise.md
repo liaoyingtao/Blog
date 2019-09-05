@@ -74,13 +74,13 @@ promise.then(onFulfilled, onRejected);
 
 2.2.4. `onFulfilled` 和 `onRejected` 只有在 [执行环境](https://es5.github.io/#x10.3) 堆栈仅包含 "platform code" 时才可被调用 <sup>注1</sup>。
 
-2.2.5. `onFulfilled` 和 `onRejected` 必须作为函数被调用（即没有 `this` 值） <sup>注2</sup>。
+2.2.5. `onFulfilled` 和 `onRejected` 必须作为函数被调用（即没有 `this` 值） 。
 
 2.2.6. 在同一个 promise 中，`then` 方法可以被多次调用：
 - 当 `promise` 完成时，所有 `onFulfilled` 回调必须按照 `then` 起始的顺序依次调用。
 - 当 `promise` 失败时，所有 `onRejected` 回调必须按照 `then` 起始的顺序依次调用。
 
-2.2.7. `then` 方法必须返回一个 promise <sup>注3</sup>。
+2.2.7. `then` 方法必须返回一个 promise 。
 ```js
 promise2 = promise1.then(onFulfilled, onRejected);
 ```
@@ -114,7 +114,7 @@ promise2.then(val => {
 - 当 `x` 成功时，需要以相同失败原因拒绝 `promise`。
 
 2.3.3. 如果 `x` 是一个对象或函数时：
-- 把 `x.then` 赋值给 `then`。<sup>注5</sup>
+- 把 `x.then` 赋值给 `then`。
 - 如果取 `x.then` 的值时抛出异常 `e`，以参数 `e` 拒绝 `promise`。
 - 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
   - 当 `resolvePromise` 以参数 `y` 被调用后，继续运行 `[[Resolve]](promise, y)`。（译者注：`y` 是 `x` 中 resolve 的值）
@@ -131,11 +131,3 @@ promise2.then(val => {
 
 ## 3. 注解
 注1 这里的 "platform code" 表示引擎、环境和实现 promise 的代码。在实践中需要确保 `onFulfilled` 和 `onRejected` 是异步执行，且应该在 `then` 方法被调用的那一轮事件循环之后的新执行栈中执行。可以利用像 `setTimeout` 或 `setImmediate` 这样的 "宏任务" 机制，或 `MutationObserver` 或 `process.nextTick` 这样的 "微任务" 实现。由于 promise 的实现本来就是 platform code，被调用后，它自身可能就包含了一个任务调度队列。
-
-注2 这里的意思是，在严格模式下 `this` 将会是 `undefined`，在松散模式下，它将是全局对象。
-
-注3 在满足所有规范的情况下，可以允许 `promise2 === promise1` 。每个实现都需要文档说明，在什么情况下，是否支持 `promise2 === promise1`。
-
-注5 这步我们先是存储了一个指向 x.then 的引用，然后测试并调用该引用，以避免多次访问 x.then 属性。这种预防措施确保了该属性的一致性，因为其值可能在检索调用时被改变。
-
-注6 实现不应该对 thenable 链的深度设限，并假定超出本限制的递归就是无限循环。只有真正的循环递归才应能导致 TypeError 异常；如果一条无限长的链上 thenable 均不相同，那么递归下去永远是正确的行为。
