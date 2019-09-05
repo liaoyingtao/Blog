@@ -84,8 +84,8 @@ promise.then(onFulfilled, onRejected);
 ```js
 promise2 = promise1.then(onFulfilled, onRejected);
 ```
-- 如果 `onFulfilled` 或 `onRejected` 返回了值 x，则运行 `[[Resolve]](promise2, x)` 处理 Promise。（译者注：意思是 promise1 的返回值将作为 promise2 的参数）
-- 如果 `onFulfilled` 或 `onRejected` 抛出异常 `e`，则 `promise2` 将因为 `e` 失败。
+- 如果 `onFulfilled` 或 `onRejected` 返回了值 `x`，则运行 `[[Resolve]](promise2, x)` 处理 Promise。（译者注：意思是 promise1 的返回值将作为 promise2 的参数）
+- 如果 `onFulfilled` 或 `onRejected` 抛出异常 `e`，则 `promise2` 失败，参数为 `e`。
 - 如果 `onFulfilled` 不是函数，且 `promise1` 已成功，则 `promise2` 将以同一值执行。（译者注：第三和第四条的意思是，将参数一层一层传递下去，如下面代码）
 - 如果 `onRejected` 不是函数，且 `promise1` 已失败，则 `promise2` 将以同一失败原因失败。
 
@@ -106,7 +106,7 @@ promise2.then(val => {
 
 为了实现 `[[Resolve]](promise, x)`，需遵循以下内容：
 
-2.3.1. 如果 `promise` 和 `x` 指向同一个对象，`promise` 将失败，并抛出 `TypeError` 异常。
+2.3.1. 如果 `promise` 和 `x` 指向同一个对象，`promise` 将失败，并抛出 `TypeError` 异常。（译者注：循环引用）
 
 2.3.2. 如果 `x` 是一个 promise，则采用它的状态：<sup>注4</sup>
 - 如果 `x` 处于 pending，`promise` 必须停留在 pending 状态，直到 x 转换为 fulfilled 或 rejected。
@@ -115,10 +115,10 @@ promise2.then(val => {
 
 2.3.3. 如果 `x` 是一个对象或函数时：
 - 把 `x.then` 赋值给 `then`。<sup>注5</sup>
-- 如果取 `x.then` 的值时抛出异常 `e`，则以 `e` 为据因拒绝 `promise`。
-- 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，`then` 的第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
+- 如果取 `x.then` 的值时抛出异常 `e`，以参数 `e` 拒绝 `promise`。
+- 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
   - 如果 `resolvePromise` 被调用后返回值 `y`，则继续运行 `[[Resolve]](promise, y)`。
-  - 如果 `rejectPromise` 被调用后返回据因 `r`，则以据因为 `r` 拒绝 promise。
+  - 如果 `rejectPromise` 被调用后返回据因 `r`，以参数 `r` 拒绝 promise。
   - 如果 `resolvePromise` 和 `rejectPromise` 均被调用，或以同一参数多次调用，第一次调用将有优先权，并忽略其他的调用。
   - 如果调用 `then` 方法抛出异常 `e`：
     - 如果 `resolvePromise` 和 `rejectPromise` 已经被调用，那么忽略此操作。
@@ -135,8 +135,6 @@ promise2.then(val => {
 注2 这里的意思是，在严格模式下 `this` 将会是 `undefined`，在松散模式下，它将是全局对象。
 
 注3 在满足所有规范的情况下，可以允许 `promise2 === promise1` 。每个实现都需要文档说明，在什么情况下，是否支持 `promise2 === promise1`。
-
-注4 一般情况下，只有当 `x` 是一个满足规范的实现才是一个真正的 promise。这些条例允许一些特殊实现去兼容已知的符合规范的 promises。
 
 注5 这步我们先是存储了一个指向 x.then 的引用，然后测试并调用该引用，以避免多次访问 x.then 属性。这种预防措施确保了该属性的一致性，因为其值可能在检索调用时被改变。
 
