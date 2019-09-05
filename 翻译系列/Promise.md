@@ -117,8 +117,8 @@ promise2.then(val => {
 - 把 `x.then` 赋值给 `then`。<sup>注5</sup>
 - 如果取 `x.then` 的值时抛出异常 `e`，以参数 `e` 拒绝 `promise`。
 - 如果 `then` 是一个函数，则将 `x` 作为 `this` 调用它，第一个参数为 `resolvePromise`，第二个参数为 `rejectPromise`：
-  - 如果 `resolvePromise` 被调用后返回值 `y`，则继续运行 `[[Resolve]](promise, y)`。
-  - 如果 `rejectPromise` 被调用后返回据因 `r`，以参数 `r` 拒绝 promise。
+  - 当 `resolvePromise` 以参数 `y` 被调用后，继续运行 `[[Resolve]](promise, y)`。（译者注：`y` 是 `x` 中 resolve 的值）
+  - 当 `rejectPromise` 以参数 `r` 被调用后，拒绝 promise。（译者注：`r` 是 `x` 中 reject 的值）
   - 如果 `resolvePromise` 和 `rejectPromise` 均被调用，或以同一参数多次调用，第一次调用将有优先权，并忽略其他的调用。
   - 如果调用 `then` 方法抛出异常 `e`：
     - 如果 `resolvePromise` 和 `rejectPromise` 已经被调用，那么忽略此操作。
