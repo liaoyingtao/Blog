@@ -86,7 +86,7 @@ promise2 = promise1.then(onFulfilled, onRejected);
 ```
 - 如果 `onFulfilled` 或 `onRejected` 返回了值 `x`，则运行 `[[Resolve]](promise2, x)` 处理 Promise。
 - 如果 `onFulfilled` 或 `onRejected` 抛出异常 `e`，则 `promise2` 失败，参数为 `e`。
-- 如果 `onFulfilled` 不是函数，且 `promise1` 已成功，则 `promise2` 将以同一值执行。（译者注：第三和第四条的意思是，将参数一层一层传递下去，如下面代码）
+- 如果 `onFulfilled` 不是函数，且 `promise1` 已成功，则 `promise2` 将以同一值执行。（译者注：第三和第四条的意思是，将参数一层一层传递下去，如下代码）
 - 如果 `onRejected` 不是函数，且 `promise1` 已失败，则 `promise2` 将以同一失败原因失败。
 
 ```js
